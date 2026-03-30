@@ -1,0 +1,22 @@
+extends: config/base.yaml
+
+experiment:
+  name: extended_f1_ridge
+  feature_set: F1
+  description: Extended model with demographic structure and control variables.
+
+features:
+  numeric:
+    - AllAges
+    - gp_availability
+    - share_age_65_plus
+    - share_female
+    - deprivation_index
+  categorical:
+    - HB
+    - HSCP
+
+model:
+  type: ridge
+  params:
+    alpha: 1.0

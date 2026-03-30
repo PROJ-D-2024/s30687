@@ -1,0 +1,25 @@
+project:
+  name: gp-hospital-utilization-thesis
+  random_seed: 42
+
+paths:
+  raw_data_dir: data/raw
+  processed_data_dir: data/processed
+  models_dir: models
+  reports_dir: reports
+
+data:
+  target_column: hospital_use_per_1000
+  id_column: PracticeCode
+  time_column: Date
+  test_size: 0.2
+  n_splits_cv: 5
+
+preprocessing:
+  numeric_imputation: median
+  scale_for_linear_models: true
+  encode_categoricals: onehot
+
+tracking:
+  save_metrics: true
+  save_metadata: true

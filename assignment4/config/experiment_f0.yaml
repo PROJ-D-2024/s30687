@@ -1,0 +1,16 @@
+extends: config/base.yaml
+
+experiment:
+  name: baseline_f0_ols
+  feature_set: F0
+  description: Baseline model using practice size and GP availability.
+
+features:
+  numeric:
+    - AllAges
+    - gp_availability
+  categorical: []
+
+model:
+  type: ols
+  params: {}

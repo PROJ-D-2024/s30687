@@ -6,23 +6,24 @@ This protocol defines how experiments are executed so that results can be reprod
 
 ## 2. Environment specification
 
-- Python version: **3.11**
-- Dependencies: pinned in `requirements.txt` and `environment.yml`
-- Hardware target:
-  - CPU execution
-  - 8 GB RAM minimum
-  - GPU not required
+- Python version: **3.11.9**
+- Environment files: `requirements.txt` and `environment.yml`
+- Reference hardware used for validation:
+  - OS: Windows 11
+  - CPU: AMD Ryzen AI 9 HX 370 w/ Radeon 890M
+  - RAM: 30.62 GB
+  - GPU: AMD Radeon(TM) 890M Graphics (not required by the pipeline)
 
 ## 3. Random seed handling
 
 - Global seed is defined in configuration files.
 - NumPy random seed is fixed before training.
-- Python hash seed can be set externally when stricter determinism is needed.
-- Models supporting `random_state` must receive the configured seed.
+- `train_test_split` and `KFold` use the configured seed.
+- Output folder names are deterministic because they depend on the merged config hash and seed.
 
 ## 4. Determinism considerations
 
-Determinism is strongest for train/test split generation, cross-validation split generation, Ridge regression, and Random Forest with fixed `random_state`.
+Determinism is strongest for the current preprocessing, train/test split generation, cross-validation split generation, OLS, and Ridge regression on CPU.
 
 Minor numerical differences can still occur across systems or library builds.
 
@@ -31,11 +32,13 @@ Minor numerical differences can still occur across systems or library builds.
 - No absolute hard-coded paths are allowed.
 - All paths are resolved relative to the project root.
 - Inputs and outputs are defined via configuration.
+- The project exposes one command entry point: `python -m src <command> --config <file>`.
 
 ## 6. Experiment traceability
 
 Each experiment should record at least:
 
+- run slug
 - timestamp
 - experiment name
 - feature set (`F0` or `F1`)
@@ -43,6 +46,17 @@ Each experiment should record at least:
 - random seed
 - evaluation metrics
 - configuration file used
+- git commit hash
+- processed dataset hash
+- Python/package versions
+
+The deterministic run folder is:
+
+```text
+reports/runs/<experiment-name>__cfg-<hash>__seed-<seed>/
+```
+
+The top-level registry file `reports/experiment_registry.json` provides the direct mapping from configuration to result artifact locations.
 
 ## 7. Version control rules
 
@@ -57,11 +71,23 @@ Each experiment should record at least:
 - Missing value rules must be documented and consistently applied.
 - Imputation must be fitted only on training data for evaluation workflows.
 
+### Current limitation and placeholder rule
+
+The repository currently ships only the demographics workbook needed for the scaffolded preprocessing run. The following real thesis tables are still missing from the distributable repository:
+
+- hospital utilization outcome,
+- GP workforce / availability,
+- deprivation or similar control variables.
+
+To keep Assignment 4 reproducible end-to-end, preprocessing generates deterministic placeholder columns for these missing variables and records that fact in `data/processed/gp_practice_analysis_dataset_manifest.json`.
+
 ## 9. Reproduction checklist
 
-1. Create the environment from `requirements.txt` or `environment.yml`
-2. Place source data in `data/raw/`
-3. Run preprocessing with `config/base.yaml`
-4. Run baseline experiment with `config/experiment_f0.yaml`
-5. Run extended experiment with `config/experiment_f1.yaml`
-6. Compare metrics stored in `reports/`
+1. Create the Python 3.11.9 environment from `requirements.txt` or `environment.yml`.
+2. Place `gp_practice_population_demographics_merged.xlsx` in `data/raw/`.
+3. Run `python -m src preprocess --config config/base.yaml`.
+4. Run `python -m src train --config config/experiment_f0.yaml`.
+5. Run `python -m src train --config config/experiment_f1.yaml`.
+6. Inspect `reports/experiment_registry.json`.
+7. Run `python -m src evaluate --config config/experiment_f0.yaml` and `python -m src evaluate --config config/experiment_f1.yaml`.
+8. Re-run the same experiment and verify that `metrics.json` in the same deterministic run folder stays unchanged.

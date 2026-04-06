@@ -14,6 +14,20 @@ This directory separates raw and processed data to preserve reproducibility.
 3. Processed datasets should be reproducible from raw inputs and configuration.
 4. The analytical dataset should contain features needed for the F0 and F1 variants described in Assignment 3.
 
+## Current reproducible baseline
+
+At the moment the repository contains a reproducible pipeline based on the demographics workbook expected under:
+
+- `data/raw/gp_practice_population_demographics_merged.xlsx`
+
+Because the hospital utilization target table, GP workforce table, and deprivation controls are not distributed with the repository, the preprocessing step generates clearly labeled deterministic placeholder columns for:
+
+- `gp_availability`
+- `deprivation_index`
+- `hospital_use_per_1000`
+
+These placeholders are only used to prove repository organization, configuration flow, and reproducibility mechanics required by Assignment 4. They must be replaced with real thesis inputs before reporting final scientific results.
+
 ## Expected raw sources
 
 - GP practice list sizes and demographics

@@ -1,25 +1,44 @@
 project:
   name: gp-hospital-utilization-thesis
+  python_version: 3.11.9
   random_seed: 42
+  determinism: cpu_only_fixed_seed
 
 paths:
   raw_data_dir: data/raw
   processed_data_dir: data/processed
+  processed_dataset_path: data/processed/gp_practice_analysis_dataset.csv
+  processed_manifest_path: data/processed/gp_practice_analysis_dataset_manifest.json
   models_dir: models
   reports_dir: reports
+  tracking_registry_path: reports/experiment_registry.json
 
 data:
+  demographics_file: gp_practice_population_demographics_merged.xlsx
+  demographics_sheet: data
   target_column: hospital_use_per_1000
-  id_column: PracticeCode
-  time_column: Date
+  id_columns:
+    - Date
+    - PracticeCode
   test_size: 0.2
   n_splits_cv: 5
 
 preprocessing:
+  keep_sex_aggregate: All
   numeric_imputation: median
+  categorical_imputation: most_frequent
   scale_for_linear_models: true
   encode_categoricals: onehot
+
+mock_data:
+  enabled: true
+  version: demographics-only-proxy-v1
+  missing_real_sources:
+    - hospital utilization outcome table
+    - GP workforce / availability table
+    - deprivation controls table
 
 tracking:
   save_metrics: true
   save_metadata: true
+  save_model: true

@@ -7,11 +7,16 @@ __pycache__/
 
 # Virtual environments
 .venv/
+.venv311/
 venv/
 env/
 
 # Notebook checkpoints
 .ipynb_checkpoints/
+
+# Local raw data copies kept outside Git
+data/raw/*
+!data/raw/README.md
 
 # Local outputs
 models/*
@@ -25,3 +30,8 @@ data/processed/*
 .DS_Store
 Thumbs.db
 .vscode/
+
+# Local course reference materials
+04-Reproducibility-and-Code-Organization.md
+Grading and Evaluation System.pdf
+s30687.md

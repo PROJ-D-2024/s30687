@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import argparse
+from pathlib import Path
 
-from config_loader import load_config
-from utils.io_paths import get_project_root
+from src.config_loader import load_config
+from src.data_pipeline import build_analytical_dataset, save_processed_outputs
+from src.utils.io_paths import get_project_root
 
 
 def parse_args() -> argparse.Namespace:
@@ -12,24 +14,26 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def run_preprocessing(config_path: str | Path) -> dict[str, str | int]:
+    config = load_config(config_path)
+    root = get_project_root()
+    dataset, manifest = build_analytical_dataset(root, config)
+    dataset_path, manifest_path = save_processed_outputs(root, config, dataset, manifest)
+    return {
+        "dataset_path": str(dataset_path),
+        "manifest_path": str(manifest_path),
+        "row_count": int(len(dataset)),
+    }
+
+
 def main() -> None:
     args = parse_args()
-    config = load_config(args.config)
-    root = get_project_root()
-
-    raw_dir = root / config["paths"]["raw_data_dir"]
-    processed_dir = root / config["paths"]["processed_data_dir"]
-    processed_dir.mkdir(parents=True, exist_ok=True)
-
-    placeholder_output = processed_dir / "README_preprocessing_output.txt"
-    placeholder_output.write_text(
-        "This placeholder confirms where a processed analytical dataset would be saved.\n"
-        f"Raw data directory: {raw_dir}\n"
-        "The real implementation should merge GP list sizes, demographics, workforce, and hospital use data.\n",
-        encoding="utf-8",
+    result = run_preprocessing(args.config)
+    print(
+        "Preprocessing completed successfully. "
+        f"Rows: {result['row_count']}. Dataset: {result['dataset_path']}. "
+        f"Manifest: {result['manifest_path']}"
     )
-
-    print(f"Preprocessing scaffold executed successfully. Output directory: {processed_dir}")
 
 
 if __name__ == "__main__":

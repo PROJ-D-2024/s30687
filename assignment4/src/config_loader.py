@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from pathlib import Path
 from typing import Any, Dict
 
@@ -12,13 +13,26 @@ def _read_yaml(path: Path) -> Dict[str, Any]:
 
 
 def _deep_merge(base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any]:
-    merged = dict(base)
+    merged = deepcopy(base)
     for key, value in override.items():
         if key in merged and isinstance(merged[key], dict) and isinstance(value, dict):
             merged[key] = _deep_merge(merged[key], value)
         else:
             merged[key] = value
     return merged
+
+
+def _resolve_extends_path(path: Path, extends: str) -> Path:
+    candidate = Path(extends)
+    if candidate.is_absolute():
+        return candidate
+
+    for base_dir in (path.parent.parent, path.parent):
+        resolved = (base_dir / candidate).resolve()
+        if resolved.exists():
+            return resolved
+
+    return (path.parent.parent / candidate).resolve()
 
 
 def load_config(config_path: str | Path) -> Dict[str, Any]:
@@ -29,9 +43,6 @@ def load_config(config_path: str | Path) -> Dict[str, Any]:
     if not extends:
         return config
 
-    base_path = (path.parent.parent / extends).resolve() if not Path(extends).is_absolute() else Path(extends)
-    if not base_path.exists():
-        base_path = (path.parent / extends).resolve()
-
+    base_path = _resolve_extends_path(path, extends)
     base_config = _read_yaml(base_path)
     return _deep_merge(base_config, config)

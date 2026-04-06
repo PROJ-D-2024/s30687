@@ -1,10 +1,10 @@
 # Processed data
 
-This directory stores deterministic outputs created by `python -m src preprocess --config config/base.yaml`.
+This directory stores outputs created by the preprocessing step.
 
-## Expected outputs
+## Expected files
 
-- `gp_practice_analysis_dataset.csv` — analytical table consumed by training.
-- `gp_practice_analysis_dataset_manifest.json` — provenance metadata, placeholder usage, and file hashes.
+- `gp_practice_analysis_dataset.csv` - analytical dataset used by training
+- `gp_practice_analysis_dataset_manifest.json` - metadata about the dataset build, hashes, and placeholder usage
 
-These files are generated locally and ignored by Git to avoid committing derived artifacts.
+These files are generated locally and are ignored by Git.

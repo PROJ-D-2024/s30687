@@ -1,15 +1,10 @@
-# Assignment 4 — Reproducibility and Code Organization
+# Assignment 4 - Reproducibility and code organization
 
-This folder contains the reproducibility-oriented repository setup for the engineering thesis topic:
+This repository contains the Assignment 4 version of the thesis project. The goal at this stage is practical: the code should be easy to inspect, runnable from documented commands, and structured so that later experiments can be repeated without editing scripts by hand.
+
+Research question:
 
 **Can demographic structure of GP practice populations improve the explanation of variation in hospital service use in Scotland compared with a baseline model based only on practice size and GP availability?**
-
-The structure and design below are consistent with Assignment 3 and now enforce:
-
-- a modular `src/` codebase,
-- configuration-driven execution,
-- deterministic preprocessing/training/evaluation,
-- traceable experiment artifacts in `reports/` and `models/`.
 
 ## Project structure
 
@@ -26,13 +21,12 @@ assignment4/
 │   └── README.md
 ├── docs/
 │   ├── reproducibility_protocol.md
-│   └── technical_description.md
+│   ├── technical_description.md
+│   └── technical_description.pdf
 ├── models/
 ├── notebooks/
 ├── reports/
 ├── src/
-│   ├── __init__.py
-│   ├── __main__.py
 │   ├── cli.py
 │   ├── config_loader.py
 │   ├── data_pipeline.py
@@ -42,37 +36,39 @@ assignment4/
 │   ├── tracking.py
 │   ├── train.py
 │   └── utils/
-│       ├── __init__.py
-│       ├── io_paths.py
-│       └── reproducibility.py
-├── .gitignore
 ├── environment.yml
-├── requirements.txt
-└── 04-Reproducibility-and-Code-Organization.md
+└── requirements.txt
 ```
 
-## Research objective
+## What is implemented here
 
-The project is organized to support a controlled comparison between:
+The repository supports two experiment configurations:
 
-- **F0 baseline**: practice size + GP availability
-- **F1 extended model**: F0 + demographic structure (especially share of population aged 65+) and additional control variables
+- **F0** - baseline model using `AllAges` and `gp_availability`
+- **F1** - extended model adding demographic shares, deprivation proxy, and regional categorical variables
 
-The main evaluation goal is to verify whether F1 improves **R²** and reduces **RMSE** relative to F0 under the same split and evaluation protocol.
+The current configs correspond to:
 
-## Current data scope and placeholder policy
+- `config/experiment_f0.yaml` -> OLS baseline
+- `config/experiment_f1.yaml` -> Ridge model with the broader feature set
 
-The repository currently contains a demographics workbook as the raw input expected by preprocessing. The real hospital utilization outcome table, GP workforce table, and deprivation controls are **not** distributed in the repository. To keep Assignment 4 reproducible end-to-end, preprocessing creates deterministic placeholder columns for:
+## Data scope
+
+The preprocessing step expects the workbook:
+
+- `data/raw/gp_practice_population_demographics_merged.xlsx`
+
+The repository does **not** include the real hospital outcome table, GP workforce table, or deprivation controls. Because those inputs are still missing from the distributable version of the project, preprocessing creates placeholder columns for:
 
 - `gp_availability`
 - `deprivation_index`
 - `hospital_use_per_1000`
 
-These placeholders are explicitly labeled in the processed manifest and are only a technical substitute for repository validation. They must be replaced by real thesis data before reporting final scientific conclusions.
+These columns are only a temporary stand-in that lets the full pipeline run end to end. They are marked in the processed-data manifest and should be replaced with the real thesis data before drawing final conclusions.
 
 ## Installation
 
-### Option 1 — using `venv`
+### Option 1 - `venv`
 
 ```powershell
 py -3.11 -m venv .venv
@@ -81,49 +77,43 @@ python -m pip install --upgrade pip
 python -m pip install --requirement requirements.txt
 ```
 
-### Option 2 — using Conda
+### Option 2 - Conda
 
 ```powershell
 conda env create -f environment.yml
 conda activate thesis-assignment4
 ```
 
-## Python version
+## Environment used for the documented run
 
-- Required for the pinned environment: **Python 3.11.9**
-- The pipeline was validated locally with `py -3.11`
-
-## Hardware used for the documented run
-
-The repository was prepared and tested on:
-
+- Python: **3.11.9**
 - OS: Windows 11
 - CPU: **AMD Ryzen AI 9 HX 370 w/ Radeon 890M**
 - RAM: **30.62 GB**
 - GPU: **AMD Radeon(TM) 890M Graphics**
 
-The pipeline runs on CPU only. GPU is not required.
+The pipeline runs on CPU. A GPU is not required.
 
-## Seeds and determinism
+## Reproducibility rules
 
-- Global seed is set in `config/base.yaml` (`project.random_seed: 42`).
-- `random.seed(...)` and `numpy.random.seed(...)` are fixed before training.
-- Hold-out split and cross-validation folds use the configured seed.
-- Output folder names are deterministic because they depend on experiment name, config hash, and seed.
-- Small numerical differences across OS or BLAS builds are still theoretically possible, but the current CPU-only linear models are expected to be stable.
+- experiments are defined in YAML files, not by editing code
+- all paths are resolved relative to the project root
+- one entry point is used for all main stages: `python -m src ...`
+- the global seed is stored in `config/base.yaml`
+- run folders are derived from experiment name, config hash, and seed
+- training outputs are linked to config, dataset hash, git commit, and model artifact
 
 ## Pipeline stages
 
-1. Data preparation
-2. Preprocessing
-3. Feature set creation (`F0`, `F1`)
-4. Training
-5. Evaluation
-6. Result storage
+1. Read raw workbook data.
+2. Build the processed analytical dataset.
+3. Train the selected experiment.
+4. Save metrics, metadata, config snapshot, and model artifact.
+5. Read stored results through the evaluation command.
 
-## Execution instructions
+## Commands
 
-Use the single entry point below from the `assignment4/` directory:
+Run the project from the repository root:
 
 ```powershell
 python -m src preprocess --config config/base.yaml
@@ -133,14 +123,14 @@ python -m src evaluate --config config/experiment_f0.yaml
 python -m src evaluate --config config/experiment_f1.yaml
 ```
 
-## What each stage writes
+## Generated outputs
 
 After preprocessing:
 
 - `data/processed/gp_practice_analysis_dataset.csv`
 - `data/processed/gp_practice_analysis_dataset_manifest.json`
 
-After training each experiment:
+After training:
 
 - `reports/runs/<run_slug>/metrics.json`
 - `reports/runs/<run_slug>/metadata.json`
@@ -148,53 +138,22 @@ After training each experiment:
 - `reports/experiment_registry.json`
 - `models/<run_slug>/model.joblib`
 
-## Expected outputs
+## Reproducing the assignment run from scratch
 
-- processed dataset and manifest in `data/processed/`
-- run-specific metrics and metadata in `reports/runs/`
-- registry mapping `config -> run_slug -> metrics/model` in `reports/experiment_registry.json`
-- joblib model artifacts in `models/`
+1. Create the Python 3.11.9 environment.
+2. Put `gp_practice_population_demographics_merged.xlsx` in `data/raw/`.
+3. Run preprocessing with `config/base.yaml`.
+4. Train `experiment_f0.yaml`.
+5. Train `experiment_f1.yaml`.
+6. Inspect the saved outputs with `python -m src evaluate --config ...`.
+7. Check `reports/experiment_registry.json` to confirm which config produced which run.
 
-## Reproducibility rules
+## Quick repeatability check
 
-- no hard-coded absolute paths
-- configuration-driven experiments via YAML
-- one unified entry point: `python -m src ...`
-- explicit dependency versions
-- fixed random seed in config
-- results linked to configuration hash, git commit, dataset hash, and model type
+If you run the same training command again with the same config and seed, the output should go to the same deterministic run folder. A simple way to check this is to compare the hash of `metrics.json` before and after a rerun.
 
-## How to reproduce the documented result from zero
-
-1. Clone the repository.
-2. Create the Python 3.11.9 environment from `requirements.txt` or `environment.yml`.
-3. Place `gp_practice_population_demographics_merged.xlsx` in `data/raw/`.
-4. Run preprocessing.
-5. Run baseline F0 training.
-6. Run extended F1 training.
-7. Inspect metrics with `python -m src evaluate --config ...`.
-8. Verify `reports/experiment_registry.json` for the config-to-result mapping.
-
-## Quick reproducibility check
-
-Run the same experiment twice and compare the metrics file hash:
-
-```powershell
-python -m src train --config config/experiment_f1.yaml
-$metrics = Get-ChildItem .\reports\runs -Recurse -Filter metrics.json |
-  Where-Object { $_.FullName -like '*extended-f1-ridge*' } |
-  Select-Object -First 1 -ExpandProperty FullName
-$hash_before = (Get-FileHash $metrics -Algorithm SHA256).Hash
-python -m src train --config config/experiment_f1.yaml
-$hash_after = (Get-FileHash $metrics -Algorithm SHA256).Hash
-"before=$hash_before"
-"after=$hash_after"
-```
-
-The metrics content stored under the deterministic `run_slug` should remain unchanged for repeated runs with the same config and seed.
-
-See also:
+## Related documentation
 
 - `docs/reproducibility_protocol.md`
 - `docs/technical_description.md`
-- `docs/technical_description.pdf` (if present in your local copy)
+- `docs/technical_description.pdf`

@@ -2,4 +2,4 @@
 
 This directory is optional and should only contain exploratory work.
 
-Assignment 4 requires that the reproducible pipeline lives in `src/` and is executable without notebooks. Any notebook used later must call the same configuration-driven code paths instead of duplicating hidden preprocessing logic.
+The reproducible pipeline for Assignment 4 lives in `src/`. If notebooks are added later, they should call the existing code instead of reimplementing preprocessing or training steps inside notebook cells.

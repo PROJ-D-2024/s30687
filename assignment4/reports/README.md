@@ -1,8 +1,8 @@
 # Reports and experiment outputs
 
-Generated experiment outputs are written here.
+This directory stores the files produced during training.
 
-## Expected generated structure
+## Expected structure
 
 ```text
 reports/
@@ -14,8 +14,8 @@ reports/
         └── metrics.json
 ```
 
-## Traceability rule
+## What is stored here
 
-- `experiment_registry.json` stores the deterministic mapping between configuration file, run slug, metrics location, and model artifact location.
-- Each run folder contains a frozen configuration snapshot and metadata with git commit, dataset hash, and Python/package versions.
-- Results are ignored by Git because they are reproducible local artifacts.
+- `experiment_registry.json` links configs to run folders and saved artifacts
+- each run folder keeps the frozen config, metadata, and metrics for one experiment run
+- these files are generated locally and are not treated as hand-edited documentation

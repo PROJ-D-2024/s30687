@@ -1,25 +1,25 @@
-# Configuration layout
+# Configuration
 
-This directory separates shared configuration from experiment-specific overrides.
+This directory contains the YAML files that control the pipeline.
 
 ## Files
 
-- `base.yaml` — global paths, preprocessing defaults, seed, dependency assumptions, and tracking conventions.
-- `experiment_f0.yaml` — baseline experiment (`F0`) using practice size and GP availability proxy.
-- `experiment_f1.yaml` — extended experiment (`F1`) adding demographic structure and controls.
+- `base.yaml` - shared settings used by all runs: paths, seed, preprocessing options, data locations, and tracking rules
+- `experiment_f0.yaml` - baseline setup for the F0 feature set
+- `experiment_f1.yaml` - extended setup for the F1 feature set
 
-## Naming convention
+## How it works
 
-- `experiment_<feature_set>.yaml` defines one reproducible experiment.
-- Each experiment extends `config/base.yaml`.
-- The training command stores a snapshot of the merged configuration next to the generated metrics.
+- each experiment file extends `config/base.yaml`
+- the code reads the merged configuration at runtime
+- training saves that merged version as `config_snapshot.yaml` inside the run folder
 
-## Traceability rule
+## Traceability
 
-The folder name in `reports/runs/` is derived from:
+The run folder name is based on:
 
-1. experiment name,
-2. merged configuration hash,
-3. seed.
+1. experiment name
+2. configuration hash
+3. seed
 
-This makes the mapping `config -> run folder -> metrics/model` deterministic.
+Because of that, the mapping from config file to run folder stays stable as long as the config content and seed do not change.

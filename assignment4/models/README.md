@@ -1,7 +1,7 @@
 # Models
 
-Trained model artifacts are saved locally under deterministic run-specific folders such as:
+Saved model artifacts are written to run-specific folders such as:
 
 - `models/<run_slug>/model.joblib`
 
-Large or confidential models should remain outside Git. The corresponding run metadata in `reports/` must still indicate where the model came from and which configuration generated it.
+These files are local outputs, not source files. If a model is too large or sensitive to keep in the repository, the matching metadata in `reports/` should still show which run created it.

@@ -16,17 +16,14 @@ This directory keeps raw inputs separate from generated outputs.
 
 ## Current input scope
 
-The current pipeline is built around:
+The committed sample bundle consists of:
 
-- `data/raw/gp_practice_population_demographics_merged.xlsx`
+- `data/raw/sample_gp_practice_population_demographics.csv`
+- `data/raw/sample_gp_practice_supporting_inputs.csv`
 
-The real hospital outcome table, GP workforce data, and deprivation controls are still missing from the distributable repository. For that reason, preprocessing generates labeled placeholder columns for:
+Together these files are enough to build the processed dataset and train both configured experiments without inventing missing target values during the normal documented run.
 
-- `gp_availability`
-- `deprivation_index`
-- `hospital_use_per_1000`
-
-Those placeholders exist only so the repository can be run and checked end to end. They are not meant to stand in for final thesis results.
+The project still contains an optional placeholder fallback in code for private-data scenarios, but that fallback is disabled in the default config and is not the primary reproducibility path documented for Assignment 4.
 
 ## Expected raw sources in the final version
 

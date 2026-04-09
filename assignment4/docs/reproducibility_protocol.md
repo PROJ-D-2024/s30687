@@ -20,7 +20,7 @@ The current pipeline runs on CPU, so the GPU is not required.
 
 - run commands from the project root
 - use `python -m src <command> --config <file>` as the standard entry point
-- keep all paths relative to the repository root
+- keep all paths relative to the Assignment 4 project root (`assignment4/`)
 - define experiment differences in YAML config files instead of editing code
 
 ## 4. Seed handling
@@ -39,17 +39,18 @@ For the current CPU-only preprocessing and linear models, this is enough to make
 - cleaning and feature derivation are script-based
 - imputers and encoders are fitted inside the training pipeline, not on the full dataset beforehand
 
-### Current placeholder rule
+### Current input bundle
 
-The distributable repository currently includes only the demographics workbook used by preprocessing. The real hospital outcome table, GP workforce data, and deprivation controls are still missing from the shared project package.
+The shared Assignment 4 package includes a tiny synthetic raw-data bundle:
 
-Because of that, preprocessing generates deterministic placeholder columns for:
+- `data/raw/sample_gp_practice_population_demographics.csv`
+- `data/raw/sample_gp_practice_supporting_inputs.csv`
 
-- `gp_availability`
-- `deprivation_index`
-- `hospital_use_per_1000`
+These files are sufficient for the standard documented rerun. The processed-data manifest records both input files and their hashes.
 
-This is recorded in `data/processed/gp_practice_analysis_dataset_manifest.json`. The placeholders are there only to make the Assignment 4 pipeline runnable from start to finish.
+### Optional placeholder fallback
+
+If the supporting input table is intentionally removed and `mock_data.enabled` is switched on, preprocessing can still generate deterministic placeholder values for `gp_availability`, `deprivation_index`, and `hospital_use_per_1000`. That path is kept only as a temporary fallback and is disabled in the default config used for reproducibility.
 
 ## 6. Traceability requirements
 
@@ -75,12 +76,13 @@ The metadata should make it possible to link a result to:
 ## 7. Standard rerun procedure
 
 1. Create the Python 3.11.9 environment from `requirements.txt` or `environment.yml`.
-2. Place `gp_practice_population_demographics_merged.xlsx` in `data/raw/`.
-3. Run `python -m src preprocess --config config/base.yaml`.
-4. Run `python -m src train --config config/experiment_f0.yaml`.
-5. Run `python -m src train --config config/experiment_f1.yaml`.
-6. Inspect `reports/experiment_registry.json`.
-7. Read stored results with `python -m src evaluate --config config/experiment_f0.yaml` and `python -m src evaluate --config config/experiment_f1.yaml`.
+2. Move into `assignment4/`.
+3. Confirm that `data/raw/sample_gp_practice_population_demographics.csv` and `data/raw/sample_gp_practice_supporting_inputs.csv` are present.
+4. Run `python -m src preprocess --config config/base.yaml`.
+5. Run `python -m src train --config config/experiment_f0.yaml`.
+6. Inspect `reports/experiment_registry.json` and `reports/runs/<run_slug>/`.
+7. Read stored results with `python -m src evaluate --config config/experiment_f0.yaml`.
+8. Optionally repeat training/evaluation for `config/experiment_f1.yaml`.
 
 ## 8. Quick repeatability check
 

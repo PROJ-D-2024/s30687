@@ -8,6 +8,8 @@ This directory contains the YAML files that control the pipeline.
 - `experiment_f0.yaml` - baseline setup for the F0 feature set
 - `experiment_f1.yaml` - extended setup for the F1 feature set
 
+The default `base.yaml` points to the tiny synthetic sample bundle committed in `data/raw/`, so the documented commands can be rerun immediately after cloning the repository.
+
 ## How it works
 
 - each experiment file extends `config/base.yaml`

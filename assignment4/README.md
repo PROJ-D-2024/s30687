@@ -54,17 +54,14 @@ The current configs correspond to:
 
 ## Data scope
 
-The preprocessing step expects the workbook:
+The repository now includes a tiny **synthetic sample bundle** that is sufficient to run the full Assignment 4 pipeline from scratch:
 
-- `data/raw/gp_practice_population_demographics_merged.xlsx`
+- `data/raw/sample_gp_practice_population_demographics.csv`
+- `data/raw/sample_gp_practice_supporting_inputs.csv`
 
-The repository does **not** include the real hospital outcome table, GP workforce table, or deprivation controls. Because those inputs are still missing from the distributable version of the project, preprocessing creates placeholder columns for:
+The first file provides the demographic structure per practice and month. The second file provides the supporting variables required by the configured experiments: `gp_availability`, `deprivation_index`, and `hospital_use_per_1000`.
 
-- `gp_availability`
-- `deprivation_index`
-- `hospital_use_per_1000`
-
-These columns are only a temporary stand-in that lets the full pipeline run end to end. They are marked in the processed-data manifest and should be replaced with the real thesis data before drawing final conclusions.
+These files are anonymized toy inputs prepared only to prove reproducibility and code organization. They are **not** the real thesis dataset and are not meant to support substantive conclusions. When the full thesis bundle is ready, the files in `data/raw/` can be replaced and the config can be updated without changing the rest of the pipeline.
 
 ## Installation
 
@@ -105,7 +102,7 @@ The pipeline runs on CPU. A GPU is not required.
 
 ## Pipeline stages
 
-1. Read raw workbook data.
+1. Read raw input data.
 2. Build the processed analytical dataset.
 3. Train the selected experiment.
 4. Save metrics, metadata, config snapshot, and model artifact.
@@ -113,13 +110,19 @@ The pipeline runs on CPU. A GPU is not required.
 
 ## Commands
 
-Run the project from the repository root:
+Run the project from the `assignment4/` directory:
 
 ```powershell
+cd assignment4
 python -m src preprocess --config config/base.yaml
 python -m src train --config config/experiment_f0.yaml
-python -m src train --config config/experiment_f1.yaml
 python -m src evaluate --config config/experiment_f0.yaml
+```
+
+Optional extended run:
+
+```powershell
+python -m src train --config config/experiment_f1.yaml
 python -m src evaluate --config config/experiment_f1.yaml
 ```
 
@@ -138,19 +141,36 @@ After training:
 - `reports/experiment_registry.json`
 - `models/<run_slug>/model.joblib`
 
+One example run artifact folder is committed in the repository so that traceability is visible even before you execute anything locally.
+
 ## Reproducing the assignment run from scratch
 
 1. Create the Python 3.11.9 environment.
-2. Put `gp_practice_population_demographics_merged.xlsx` in `data/raw/`.
-3. Run preprocessing with `config/base.yaml`.
-4. Train `experiment_f0.yaml`.
-5. Train `experiment_f1.yaml`.
-6. Inspect the saved outputs with `python -m src evaluate --config ...`.
-7. Check `reports/experiment_registry.json` to confirm which config produced which run.
+2. Confirm that the bundled sample files are present in `assignment4/data/raw/`.
+3. From `assignment4/`, run:
+
+   ```powershell
+   python -m src preprocess --config config/base.yaml
+   python -m src train --config config/experiment_f0.yaml
+   python -m src evaluate --config config/experiment_f0.yaml
+   ```
+
+4. Check that the following files appear:
+   - `data/processed/gp_practice_analysis_dataset.csv`
+   - `data/processed/gp_practice_analysis_dataset_manifest.json`
+   - `reports/runs/<run_slug>/metrics.json`
+   - `reports/runs/<run_slug>/metadata.json`
+   - `reports/runs/<run_slug>/config_snapshot.yaml`
+   - `reports/experiment_registry.json`
+5. If needed, run `experiment_f1.yaml` in the same way to inspect the extended configuration.
 
 ## Quick repeatability check
 
 If you run the same training command again with the same config and seed, the output should go to the same deterministic run folder. A simple way to check this is to compare the hash of `metrics.json` before and after a rerun.
+
+## Optional placeholder fallback
+
+The code still contains an explicit fallback for situations where only the demographics table is available. That mode is disabled in `config/base.yaml` and should be treated only as a temporary scaffold, not as the default reproducible path.
 
 ## Related documentation
 

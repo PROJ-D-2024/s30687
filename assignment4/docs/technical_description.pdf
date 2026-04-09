@@ -13,7 +13,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
 endobj
 5 0 obj
-<< /Length 2482 >>
+<< /Length 2523 >>
 stream
 BT
 /F1 11 Tf
@@ -51,9 +51,9 @@ T*
 T*
 (In practical terms, another person should be able to see where raw data belongs, run the) Tj
 T*
-(main commands from the repository root, and identify which configuration produced a given) Tj
+(main commands from the Assignment 4 project root \(assignment4/\), and identify which) Tj
 T*
-(model and a given metrics file.) Tj
+(configuration produced a given model and a given metrics file.) Tj
 T*
 () Tj
 T*
@@ -115,7 +115,7 @@ T*
 T*
 () Tj
 T*
-(At the moment the pipeline expects one raw workbook in data/raw/:) Tj
+(The repository now ships with a minimal synthetic raw-data bundle in data/raw/:) Tj
 T*
 () Tj
 ET
@@ -125,19 +125,21 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 7 0 R >>
 endobj
 7 0 obj
-<< /Length 2642 >>
+<< /Length 2601 >>
 stream
 BT
 /F1 11 Tf
 50 790 Td
 14 TL
-(- gp_practice_population_demographics_merged.xlsx) Tj
+(- sample_gp_practice_population_demographics.csv) Tj
+T*
+(- sample_gp_practice_supporting_inputs.csv) Tj
 T*
 () Tj
 T*
-(The preprocessing code reads the data sheet, checks that the required columns exist, parses) Tj
+(The preprocessing code reads the demographics table, checks that the required columns exist,) Tj
 T*
-(the Date column, and reshapes the workbook into an analytical table with one row per) Tj
+(parses the Date column, and reshapes the input into an analytical table with one row per) Tj
 T*
 (practice and date.) Tj
 T*
@@ -161,11 +163,9 @@ T*
 T*
 () Tj
 T*
-(The current repository does not yet ship the real hospital outcome table, GP workforce data,) Tj
+(The supporting input table contributes the variables that are required by the configured) Tj
 T*
-(or deprivation controls. Because of that, src/data_pipeline.py creates placeholder columns) Tj
-T*
-(for:) Tj
+(experiments but are not derivable from demographics alone:) Tj
 T*
 () Tj
 T*
@@ -177,13 +177,11 @@ T*
 T*
 () Tj
 T*
-(These placeholders are deterministic, so they let the full project run in a repeatable way,) Tj
+(Because these sample values are included directly in the repository, the normal Assignment 4) Tj
 T*
-(but they are not meant to be treated as real thesis data. The generated manifest in) Tj
+(rerun path no longer depends on generated placeholder targets. The processed-data manifest) Tj
 T*
-(data/processed/ records that these variables were created as stand-ins. This is important) Tj
-T*
-(because it makes the limitation explicit instead of hiding it.) Tj
+(records both raw inputs and their hashes.) Tj
 T*
 () Tj
 T*
@@ -230,6 +228,8 @@ T*
 () Tj
 T*
 (The training path is implemented in src/modeling.py. It builds a scikit-learn pipeline with) Tj
+T*
+(separate handling for numeric and categorical features.) Tj
 ET
 endstream
 endobj
@@ -237,14 +237,12 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 9 0 R >>
 endobj
 9 0 obj
-<< /Length 2726 >>
+<< /Length 2621 >>
 stream
 BT
 /F1 11 Tf
 50 790 Td
 14 TL
-(separate handling for numeric and categorical features.) Tj
-T*
 () Tj
 T*
 (For numeric columns, the pipeline applies median imputation and, if enabled, standard) Tj
@@ -291,9 +289,9 @@ T*
 T*
 (documented Python version is 3.11.9. Second, the seed is stored in configuration and is) Tj
 T*
-(applied before training. Third, the project resolves paths relative to the repository root,) Tj
+(applied before training. Third, the project resolves paths relative to the Assignment 4) Tj
 T*
-(so it does not depend on machine-specific absolute paths.) Tj
+(project root, so it does not depend on machine-specific absolute paths.) Tj
 T*
 () Tj
 T*
@@ -321,9 +319,11 @@ T*
 T*
 (In addition, reports/experiment_registry.json keeps a top-level index of the saved runs. The) Tj
 T*
-(metadata includes the processed dataset hash, the git commit hash, and environment details.) Tj
+(metadata includes the git commit hash and environment details, and the repository also) Tj
 T*
-(That gives a direct link between reported numbers and the code state that produced them.) Tj
+(commits one example run folder so the config-to-result connection is visible directly in) Tj
+T*
+(Git.) Tj
 T*
 () Tj
 T*
@@ -331,17 +331,17 @@ T*
 T*
 () Tj
 T*
-(The main limitation of the current repository is data availability, not code structure. The) Tj
+(The committed raw bundle is intentionally tiny and synthetic. It is only meant to) Tj
 T*
-(pipeline is ready to accept the real hospital outcome, workforce, and deprivation sources,) Tj
+(demonstrate reproducibility, configuration handling, and artifact tracking in a fully) Tj
 T*
-(but those tables are not part of the shared package yet.) Tj
+(runnable way.) Tj
 T*
 () Tj
 T*
-(When those data sources are available, the placeholder generation in preprocessing should be) Tj
+(When the full thesis data bundle is ready, the same structure can be reused with larger real) Tj
 T*
-(removed and replaced with the real merge logic. The rest of the project layout can stay the) Tj
+(inputs. The current code also keeps an explicit placeholder fallback mode for private-data) Tj
 ET
 endstream
 endobj
@@ -349,15 +349,15 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 11 0 R >>
 endobj
 11 0 obj
-<< /Length 769 >>
+<< /Length 740 >>
 stream
 BT
 /F1 11 Tf
 50 790 Td
 14 TL
-(same. That is one of the benefits of the current design: the data layer can be improved) Tj
+(scenarios, but that mode is disabled in the default config and is no longer the main) Tj
 T*
-(without reorganizing commands, configs, or artifact storage.) Tj
+(documented path.) Tj
 T*
 () Tj
 T*
@@ -369,15 +369,15 @@ T*
 T*
 (separates code, configuration, data, outputs, and documentation; it provides one repeatable) Tj
 T*
-(way to run preprocessing and training; and it leaves behind enough metadata to connect) Tj
+(way to run preprocessing and training from the bundled sample inputs; and it leaves behind) Tj
 T*
-(results to a specific configuration and code state.) Tj
+(enough metadata to connect results to a specific configuration and code state.) Tj
 T*
 () Tj
 T*
-(The project is still a scaffold, because some real thesis inputs are missing, but the) Tj
+(The sample data are intentionally small and synthetic, but the technical foundation is now) Tj
 T*
-(technical foundation is now clear and usable for the next stage of the work.) Tj
+(clear, runnable, and ready for the next stage of the work.) Tj
 ET
 endstream
 endobj
@@ -389,14 +389,14 @@ xref
 0000000140 00000 n 
 0000000210 00000 n 
 0000000336 00000 n 
-0000002870 00000 n 
-0000002996 00000 n 
+0000002911 00000 n 
+0000003037 00000 n 
 0000005690 00000 n 
 0000005816 00000 n 
-0000008594 00000 n 
-0000008722 00000 n 
+0000008489 00000 n 
+0000008617 00000 n 
 trailer
 << /Size 12 /Root 1 0 R >>
 startxref
-9543
+9409
 %%EOF

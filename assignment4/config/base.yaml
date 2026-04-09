@@ -14,8 +14,9 @@ paths:
   tracking_registry_path: reports/experiment_registry.json
 
 data:
-  demographics_file: gp_practice_population_demographics_merged.xlsx
+  demographics_file: sample_gp_practice_population_demographics.csv
   demographics_sheet: data
+  supporting_inputs_file: sample_gp_practice_supporting_inputs.csv
   target_column: hospital_use_per_1000
   id_columns:
     - Date
@@ -31,7 +32,7 @@ preprocessing:
   encode_categoricals: onehot
 
 mock_data:
-  enabled: true
+  enabled: false
   version: demographics-only-proxy-v1
   missing_real_sources:
     - hospital utilization outcome table

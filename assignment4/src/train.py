@@ -9,7 +9,7 @@ import joblib
 from src.config_loader import load_config
 from src.modeling import run_experiment
 from src.tracking import build_artifact_paths, upsert_registry, write_json, write_yaml
-from src.utils.io_paths import get_project_root
+from src.utils.io_paths import get_project_root, to_project_relative_path
 from src.utils.reproducibility import (
     build_run_metadata,
     build_run_slug,
@@ -49,7 +49,7 @@ def run_training(config_path: str | Path) -> dict[str, str]:
         model_type=config["model"]["type"],
         feature_set=config["experiment"]["feature_set"],
         seed=seed,
-        config_path=str(Path(config_path).resolve()),
+        config_path=to_project_relative_path(config_path, root),
     )
     metadata.update(
         {
@@ -58,13 +58,13 @@ def run_training(config_path: str | Path) -> dict[str, str]:
             "config_hash": config_hash,
             "experiment_description": config["experiment"]["description"],
             "git_commit": get_git_commit_hash(root),
-            "dataset_path": str(training_result["dataset_path"]),
+            "dataset_path": to_project_relative_path(training_result["dataset_path"], root),
             "dataset_sha256": training_result["dataset_sha256"],
             "environment": environment,
             "artifact_locations": {
-                "metrics_path": str(artifact_paths["metrics_path"]),
-                "model_path": str(artifact_paths["model_path"]),
-                "config_snapshot_path": str(artifact_paths["config_snapshot_path"]),
+                "metrics_path": to_project_relative_path(artifact_paths["metrics_path"], root),
+                "model_path": to_project_relative_path(artifact_paths["model_path"], root),
+                "config_snapshot_path": to_project_relative_path(artifact_paths["config_snapshot_path"], root),
             },
         }
     )
@@ -81,11 +81,11 @@ def run_training(config_path: str | Path) -> dict[str, str]:
         "run_slug": run_slug,
         "experiment_name": config["experiment"]["name"],
         "feature_set": config["experiment"]["feature_set"],
-        "config_path": str(Path(config_path).resolve()),
+        "config_path": to_project_relative_path(config_path, root),
         "config_hash": config_hash,
-        "metrics_path": str(artifact_paths["metrics_path"]),
-        "metadata_path": str(artifact_paths["metadata_path"]),
-        "model_path": str(artifact_paths["model_path"]),
+        "metrics_path": to_project_relative_path(artifact_paths["metrics_path"], root),
+        "metadata_path": to_project_relative_path(artifact_paths["metadata_path"], root),
+        "model_path": to_project_relative_path(artifact_paths["model_path"], root),
         "git_commit": metadata["git_commit"],
         "holdout_r2": metrics_payload["holdout"]["r2"],
         "holdout_rmse": metrics_payload["holdout"]["rmse"],

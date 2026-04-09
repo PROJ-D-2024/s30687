@@ -63,7 +63,7 @@ def build_run_slug(
 def get_git_commit_hash(project_root: Path) -> str:
     try:
         result = subprocess.run(
-            ["git", "-C", str(project_root), "rev-parse", "--short", "HEAD"],
+            ["git", "-C", str(project_root), "rev-parse", "HEAD"],
             check=True,
             capture_output=True,
             text=True,

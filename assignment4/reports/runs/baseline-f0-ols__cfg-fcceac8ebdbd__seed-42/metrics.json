@@ -1,0 +1,42 @@
+{
+  "primary_metric": "holdout_rmse",
+  "holdout": {
+    "r2": 0.98389,
+    "rmse": 4.028705,
+    "mae": 3.263776
+  },
+  "cross_validation": {
+    "folds": 5,
+    "mean_r2": 0.970187,
+    "std_r2": 0.032032,
+    "mean_rmse": 3.124091,
+    "std_rmse": 1.523113,
+    "mean_mae": 2.89435,
+    "std_mae": 1.520639
+  },
+  "dataset": {
+    "row_count": 12,
+    "train_rows": 9,
+    "test_rows": 3,
+    "numeric_features": [
+      "AllAges",
+      "gp_availability"
+    ],
+    "categorical_features": [],
+    "target_column": "hospital_use_per_1000"
+  },
+  "prediction_preview": [
+    {
+      "actual": 341.8,
+      "predicted": 338.401556
+    },
+    {
+      "actual": 282.9,
+      "predicted": 282.593843
+    },
+    {
+      "actual": 268.4,
+      "predicted": 274.486727
+    }
+  ]
+}

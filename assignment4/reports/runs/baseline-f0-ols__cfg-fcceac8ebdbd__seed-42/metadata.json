@@ -1,0 +1,32 @@
+{
+  "timestamp_utc": "2026-04-09T18:34:46.552464+00:00",
+  "experiment_name": "baseline_f0_ols",
+  "model_type": "ols",
+  "feature_set": "F0",
+  "random_seed": 42,
+  "config_path": "config/experiment_f0.yaml",
+  "created_at_utc": "2026-04-09T18:34:46.552464+00:00",
+  "run_slug": "baseline-f0-ols__cfg-fcceac8ebdbd__seed-42",
+  "config_hash": "fcceac8ebdbd",
+  "experiment_description": "Baseline model using practice size and GP availability.",
+  "git_commit": "f3109c0f4ee3bbd17c36c667276ed2747938f11e",
+  "dataset_path": "data/processed/gp_practice_analysis_dataset.csv",
+  "dataset_sha256": "5644ef56250989569b7a1ceda8172ee23494a947c95694983a091cf4e234371b",
+  "environment": {
+    "python_version": "3.11.9",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "packages": {
+      "numpy": "1.26.4",
+      "pandas": "2.2.2",
+      "scikit-learn": "1.5.1",
+      "PyYAML": "6.0.2",
+      "joblib": "1.4.2",
+      "openpyxl": "3.1.5"
+    }
+  },
+  "artifact_locations": {
+    "metrics_path": "reports/runs/baseline-f0-ols__cfg-fcceac8ebdbd__seed-42/metrics.json",
+    "model_path": "models/baseline-f0-ols__cfg-fcceac8ebdbd__seed-42/model.joblib",
+    "config_snapshot_path": "reports/runs/baseline-f0-ols__cfg-fcceac8ebdbd__seed-42/config_snapshot.yaml"
+  }
+}

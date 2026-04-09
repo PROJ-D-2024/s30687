@@ -1,0 +1,30 @@
+[
+  {
+    "run_slug": "baseline-f0-ols__cfg-fcceac8ebdbd__seed-42",
+    "experiment_name": "baseline_f0_ols",
+    "feature_set": "F0",
+    "config_path": "config/experiment_f0.yaml",
+    "config_hash": "fcceac8ebdbd",
+    "metrics_path": "reports/runs/baseline-f0-ols__cfg-fcceac8ebdbd__seed-42/metrics.json",
+    "metadata_path": "reports/runs/baseline-f0-ols__cfg-fcceac8ebdbd__seed-42/metadata.json",
+    "model_path": "models/baseline-f0-ols__cfg-fcceac8ebdbd__seed-42/model.joblib",
+    "git_commit": "f3109c0f4ee3bbd17c36c667276ed2747938f11e",
+    "holdout_r2": 0.98389,
+    "holdout_rmse": 4.028705,
+    "holdout_mae": 3.263776
+  },
+  {
+    "run_slug": "extended-f1-ridge__cfg-46713e57dcaf__seed-42",
+    "experiment_name": "extended_f1_ridge",
+    "feature_set": "F1",
+    "config_path": "config/experiment_f1.yaml",
+    "config_hash": "46713e57dcaf",
+    "metrics_path": "reports/runs/extended-f1-ridge__cfg-46713e57dcaf__seed-42/metrics.json",
+    "metadata_path": "reports/runs/extended-f1-ridge__cfg-46713e57dcaf__seed-42/metadata.json",
+    "model_path": "models/extended-f1-ridge__cfg-46713e57dcaf__seed-42/model.joblib",
+    "git_commit": "f3109c0f4ee3bbd17c36c667276ed2747938f11e",
+    "holdout_r2": 0.999698,
+    "holdout_rmse": 0.551504,
+    "holdout_mae": 0.502285
+  }
+]

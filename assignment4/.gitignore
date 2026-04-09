@@ -17,12 +17,21 @@ env/
 # Local raw data copies kept outside Git
 data/raw/*
 !data/raw/README.md
+!data/raw/sample_gp_practice_population_demographics.csv
+!data/raw/sample_gp_practice_supporting_inputs.csv
 
 # Local outputs
 models/*
 !models/README.md
 reports/*
 !reports/README.md
+!reports/experiment_registry.json
+!reports/runs/
+reports/runs/*
+!reports/runs/baseline-f0-ols__cfg-fcceac8ebdbd__seed-42/
+!reports/runs/baseline-f0-ols__cfg-fcceac8ebdbd__seed-42/metrics.json
+!reports/runs/baseline-f0-ols__cfg-fcceac8ebdbd__seed-42/metadata.json
+!reports/runs/baseline-f0-ols__cfg-fcceac8ebdbd__seed-42/config_snapshot.yaml
 data/processed/*
 !data/processed/README.md
 

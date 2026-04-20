@@ -1,0 +1,386 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+2 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+3 0 obj
+<< /Type /Pages /Count 6 /Kids [5 0 R 7 0 R 9 0 R 11 0 R 13 0 R 15 0 R] >>
+endobj
+4 0 obj
+<< /Length 7590 >>
+stream
+BT /F2 17.00 Tf 42.00 795.89 Td (Assignment 6 - Feature Engineering and Preprocessing) Tj ET
+BT /F1 9.50 Tf 42.00 760.89 Td (Student: s30687) Tj ET
+BT /F1 9.50 Tf 42.00 742.89 Td (Project context: GP practice hospital utilization thesis) Tj ET
+BT /F1 9.50 Tf 42.00 724.89 Td (Basis of this document: Assignment 5 exploratory data analysis and the reproducibility framework established in) Tj ET
+BT /F1 9.50 Tf 42.00 712.89 Td (Assignment 4) Tj ET
+BT /F1 9.50 Tf 42.00 694.89 Td (This document formalizes the preprocessing and feature engineering regime that will be used before baseline modeling.) Tj ET
+BT /F1 9.50 Tf 42.00 682.89 Td (Its purpose is to convert the empirical findings from Assignment 5 into an explicit, reproducible, and leakage-aware) Tj ET
+BT /F1 9.50 Tf 42.00 670.89 Td (transformation contract. The thesis question remains unchanged: whether the demographic structure of GP practice) Tj ET
+BT /F1 9.50 Tf 42.00 658.89 Td (populations improves the explanation of variation in hospital service use in Scotland beyond a simpler baseline based) Tj ET
+BT /F1 9.50 Tf 42.00 646.89 Td (only on practice size and GP availability. At this stage, the goal is not to maximize short term predictive performance,) Tj ET
+BT /F1 9.50 Tf 42.00 634.89 Td (but to define a disciplined preprocessing pipeline that can be reused across later experiments without hidden) Tj ET
+BT /F1 9.50 Tf 42.00 622.89 Td (adjustments.) Tj ET
+BT /F1 9.50 Tf 42.00 604.89 Td (The Assignment 5 EDA established the main properties of the data that now require engineering decisions. The raw) Tj ET
+BT /F1 9.50 Tf 42.00 592.89 Td (demographics table contains 83,391 rows and 23 columns, spans 1,082 practices, 16 Health Boards, and 33 HSCP units, and) Tj ET
+BT /F1 9.50 Tf 42.00 580.89 Td (covers the period from 2014-01-01 to 2021-07-01. The raw table is structurally coherent: no full-row duplicates were) Tj ET
+BT /F1 9.50 Tf 42.00 568.89 Td (found, no duplicate Date-PracticeCode-Sex keys were detected, and the age arithmetic was internally consistent for) Tj ET
+BT /F1 9.50 Tf 42.00 556.89 Td (complete sex bundles. However, several preprocessing implications were identified. First, the QF metadata columns are) Tj ET
+BT /F1 9.50 Tf 42.00 544.89 Td (almost entirely missing, with average missingness around 95.49 percent, while substantive demographic fields are nearly) Tj ET
+BT /F1 9.50 Tf 42.00 532.89 Td (complete. Second, practice size measured by AllAges is clearly right skewed, with skewness 1.545 and a long upper tail) Tj ET
+BT /F1 9.50 Tf 42.00 520.89 Td (produced by genuinely large practices rather than corrupted records. Third, demographic share variables are) Tj ET
+BT /F1 9.50 Tf 42.00 508.89 Td (compositionally dependent, so including too many overlapping counts and ratios would inflate multicollinearity. Fourth,) Tj ET
+BT /F1 9.50 Tf 42.00 496.89 Td (HB and HSCP encode nested geography and therefore require careful treatment. Fifth, repeated observations of the same) Tj ET
+BT /F1 9.50 Tf 42.00 484.89 Td (practices over time mean that naive row-wise splitting can leak practice-specific information into evaluation. The) Tj ET
+BT /F1 9.50 Tf 42.00 472.89 Td (present document addresses each of these issues explicitly.) Tj ET
+BT /F2 13.00 Tf 42.00 450.89 Td (A. Preprocessing Strategy Overview) Tj ET
+BT /F1 9.50 Tf 42.00 424.89 Td (The preprocessing strategy is organized into two layers: an analytical-dataset construction layer that is kept constant) Tj ET
+BT /F1 9.50 Tf 42.00 412.89 Td (for all experiments, and a model-specific transformation layer that operates inside the training pipeline. This) Tj ET
+BT /F1 9.50 Tf 42.00 400.89 Td (separation is necessary for both reproducibility and fairness. Every experiment must start from the same cleaned) Tj ET
+BT /F1 9.50 Tf 42.00 388.89 Td (analytical table, while all stateful transformations that learn from data distributions must be estimated only on) Tj ET
+BT /F1 9.50 Tf 42.00 376.89 Td (training folds.) Tj ET
+BT /F1 9.50 Tf 42.00 358.89 Td (The constant data-construction layer contains the following steps. First, the raw demographics table and the supporting) Tj ET
+BT /F1 9.50 Tf 42.00 346.89 Td (inputs table are validated against a fixed schema. Second, dates are parsed and key identifiers are standardized. Third,) Tj ET
+BT /F1 9.50 Tf 42.00 334.89 Td (only rows with Sex equal to All are kept as the aggregate practice population records. Fourth, female totals are merged) Tj ET
+BT /F1 9.50 Tf 42.00 322.89 Td (back by Date and PracticeCode so that share_female can be derived. Fifth, non-predictive QF metadata columns are) Tj ET
+BT /F1 9.50 Tf 42.00 310.89 Td (excluded from the modeling scope. Sixth, invalid denominator rows with AllAges less than or equal to zero are removed.) Tj ET
+BT /F1 9.50 Tf 42.00 298.89 Td (Seventh, engineered demographic ratios are created. Eighth, the supporting variables gp_availability, deprivation_index,) Tj ET
+BT /F1 9.50 Tf 42.00 286.89 Td (and hospital_use_per_1000 are merged into the analytical table. Ninth, a manifest with input hashes, row counts, and) Tj ET
+BT /F1 9.50 Tf 42.00 274.89 Td (column definitions is stored.) Tj ET
+BT /F1 9.50 Tf 42.00 256.89 Td (The model-specific layer begins only after the train and validation partitions are defined. Within each training fold,) Tj ET
+BT /F1 9.50 Tf 42.00 244.89 Td (numeric features are imputed, transformed, and scaled; categorical features are imputed and one-hot encoded; and the) Tj ET
+BT /F1 9.50 Tf 42.00 232.89 Td (estimator is fit on the transformed design matrix. The same fitted transformers are then applied to the corresponding) Tj ET
+BT /F1 9.50 Tf 42.00 220.89 Td (validation or test partition. This order is essential because imputers, scalers, and encoders all estimate quantities) Tj ET
+BT /F1 9.50 Tf 42.00 208.89 Td (from data and would leak information if fit on the full dataset before splitting. The current Assignment 4 codebase) Tj ET
+BT /F1 9.50 Tf 42.00 196.89 Td (already provides this integrated pipeline structure for imputation, scaling, encoding, and artifact tracking. Assignment) Tj ET
+BT /F1 9.50 Tf 42.00 184.89 Td (6 fixes three methodological revisions before baseline modeling on the full thesis data: use log-transformed practice) Tj ET
+BT /F1 9.50 Tf 42.00 172.89 Td (size instead of raw AllAges, drop the very small number of incomplete sex-bundle analytical keys instead of relying on a) Tj ET
+BT /F1 9.50 Tf 42.00 160.89 Td (fallback female proportion, and replace shuffled row-wise validation with PracticeCode-aware splits.) Tj ET
+BT /F1 9.50 Tf 42.00 142.89 Td (Assignment 5 provides a direct line from diagnosis to action. QF missingness leads to exclusion rather than imputation.) Tj ET
+BT /F1 9.50 Tf 42.00 130.89 Td (Right skew in AllAges leads to a monotonic size transformation rather than outlier deletion. The strong dependence) Tj ET
+BT /F1 9.50 Tf 42.00 118.89 Td (between age shares leads to a compact engineered feature set instead of many overlapping age variables. The hierarchical) Tj ET
+BT /F1 9.50 Tf 42.00 106.89 Td (nature of HB and HSCP leads to explicit encoding with regularized linear modeling rather than uncontrolled category) Tj ET
+BT /F1 9.50 Tf 42.00 94.89 Td (proliferation. Finally, repeated practice observations over time lead to group-aware validation rather than naive random) Tj ET
+BT /F1 9.50 Tf 42.00 82.89 Td (row-wise splitting.) Tj ET
+BT /F1 9.50 Tf 42.00 64.89 Td (To keep analytical continuity visible, the fixed preprocessing decisions can be summarized as follows:) Tj ET
+BT /F1 9.00 Tf 279.64 24.00 Td (Page 1) Tj ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 3 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 4 0 R >>
+endobj
+6 0 obj
+<< /Length 7398 >>
+stream
+BT /F1 9.50 Tf 42.00 795.89 Td (- QF columns are treated as metadata and removed from predictors.) Tj ET
+BT /F1 9.50 Tf 42.00 783.89 Td (- PracticeCode is retained only as an identifier for grouping and traceability, not as a predictor.) Tj ET
+BT /F1 9.50 Tf 42.00 771.89 Td (- AllAges is transformed with log1p before modeling.) Tj ET
+BT /F1 9.50 Tf 42.00 759.89 Td (- Demographic structure is represented by a small number of interpretable ratios instead of the full set of raw age) Tj ET
+BT /F1 9.50 Tf 42.00 747.89 Td (  counts.) Tj ET
+BT /F1 9.50 Tf 42.00 735.89 Td (- Geographic variables are encoded consistently across experiments.) Tj ET
+BT /F1 9.50 Tf 42.00 723.89 Td (- Imputation, scaling, encoding, and any optional feature selection occur inside the training pipeline only.) Tj ET
+BT /F1 9.50 Tf 42.00 711.89 Td (- The same cleaned dataset, target definition, and validation protocol are used for F0 and F1 so that later differences) Tj ET
+BT /F1 9.50 Tf 42.00 699.89 Td (  can be attributed to features rather than to preprocessing drift.) Tj ET
+BT /F1 9.50 Tf 42.00 681.89 Td (The relationship between the Assignment 5 findings and the Assignment 6 decisions is shown below.) Tj ET
+BT /F1 9.50 Tf 42.00 663.89 Td (Finding from Assignment 5 -> Preprocessing response in Assignment 6) Tj ET
+BT /F1 9.50 Tf 42.00 645.89 Td (QF columns have about 95.49 percent missingness -> exclude from ordinary predictors; do not impute) Tj ET
+BT /F1 9.50 Tf 42.00 627.89 Td (AllAges is strongly right skewed -> use log1p\(AllAges\), then standardize within the training pipeline) Tj ET
+BT /F1 9.50 Tf 42.00 609.89 Td (Large practices are structural outliers, not random noise -> retain rows; avoid blanket outlier deletion) Tj ET
+BT /F1 9.50 Tf 42.00 591.89 Td (Age shares are compositionally dependent and VIF is high -> use a compact feature set; avoid combining many counts and) Tj ET
+BT /F1 9.50 Tf 42.00 579.89 Td (shares) Tj ET
+BT /F1 9.50 Tf 42.00 561.89 Td (HB and HSCP are hierarchically related -> encode carefully, avoid target encoding, and rely on regularized estimation) Tj ET
+BT /F1 9.50 Tf 42.00 549.89 Td (for the extended model) Tj ET
+BT /F1 9.50 Tf 42.00 531.89 Td (Practice observations repeat over time -> use group-aware validation and fit all transformers only on training data) Tj ET
+BT /F1 9.50 Tf 42.00 513.89 Td (The target-bearing sample in the repository is tiny -> avoid target-driven engineering choices at this stage) Tj ET
+BT /F2 13.00 Tf 42.00 491.89 Td (B. Data Cleaning and Missing Value Strategy) Tj ET
+BT /F1 9.50 Tf 42.00 465.89 Td (The cleaning strategy follows a conservative principle: remove or correct only what is structurally invalid, and) Tj ET
+BT /F1 9.50 Tf 42.00 453.89 Td (otherwise preserve information. Assignment 5 showed that the substantive demographic variables are already of high) Tj ET
+BT /F1 9.50 Tf 42.00 441.89 Td (quality, so the preprocessing task is mainly to isolate the small number of irregular cases that would bias downstream) Tj ET
+BT /F1 9.50 Tf 42.00 429.89 Td (transformations if left untreated.) Tj ET
+BT /F1 9.50 Tf 42.00 411.89 Td (The first and most important missing-data decision concerns the QF columns. These variables are not ordinary predictors.) Tj ET
+BT /F1 9.50 Tf 42.00 399.89 Td (Their missingness is extreme and systematic, and the EDA already showed that they behave like metadata or quality flags) Tj ET
+BT /F1 9.50 Tf 42.00 387.89 Td (rather than stable explanatory features. Imputing them would create artificial information and would add noise to later) Tj ET
+BT /F1 9.50 Tf 42.00 375.89 Td (modeling. The correct methodological decision is therefore to exclude them from the predictive matrix entirely unless a) Tj ET
+BT /F1 9.50 Tf 42.00 363.89 Td (future, explicitly separate quality-flag study is undertaken.) Tj ET
+BT /F1 9.50 Tf 42.00 345.89 Td (For the substantive model inputs, the strategy differs by stage. During analytical-dataset construction, rows with) Tj ET
+BT /F1 9.50 Tf 42.00 333.89 Td (invalid denominators are removed because ratio features cannot be defined when AllAges is zero or negative. Assignment 5) Tj ET
+BT /F1 9.50 Tf 42.00 321.89 Td (found only two such rows, so removal is justified and has negligible impact on support. Similarly, practice-date groups) Tj ET
+BT /F1 9.50 Tf 42.00 309.89 Td (with incomplete sex bundles are handled explicitly. Because share_female depends on a valid female total, these) Tj ET
+BT /F1 9.50 Tf 42.00 297.89 Td (structurally incomplete records cannot support a faithful calculation of sex composition. Since Assignment 5 identified) Tj ET
+BT /F1 9.50 Tf 42.00 285.89 Td (only nine such groups, the preferred Assignment 6 strategy is to drop these analytical keys during dataset construction) Tj ET
+BT /F1 9.50 Tf 42.00 273.89 Td (rather than to inject an arbitrary 50-50 assumption. This improves validity and has a trivial effect on sample size.) Tj ET
+BT /F1 9.50 Tf 42.00 261.89 Td (This point is important because the current Assignment 4 sample runner uses a temporary fallback female share only to) Tj ET
+BT /F1 9.50 Tf 42.00 249.89 Td (keep the demonstrator pipeline executable on the tiny repository sample; that fallback is not accepted as the fixed) Tj ET
+BT /F1 9.50 Tf 42.00 237.89 Td (thesis preprocessing rule.) Tj ET
+BT /F1 9.50 Tf 42.00 219.89 Td (After structural cleaning, any remaining missing values in model features are handled inside the machine learning) Tj ET
+BT /F1 9.50 Tf 42.00 207.89 Td (pipeline. Numeric features are imputed with the median, while categorical features are imputed with the most frequent) Tj ET
+BT /F1 9.50 Tf 42.00 195.89 Td (category. This choice is appropriate for three reasons. First, the observed residual missingness outside the QF columns) Tj ET
+BT /F1 9.50 Tf 42.00 183.89 Td (is extremely low, so simple and robust imputation is sufficient. Second, median imputation is less sensitive than mean) Tj ET
+BT /F1 9.50 Tf 42.00 171.89 Td (imputation to the heavy upper tail in practice size. Third, fitting the imputers only on training folds preserves) Tj ET
+BT /F1 9.50 Tf 42.00 159.89 Td (experimental fairness and avoids leakage from the validation or test partitions.) Tj ET
+BT /F1 9.50 Tf 42.00 141.89 Td (Alternative approaches were considered. Complete-case analysis for all residual missing values was rejected because it) Tj ET
+BT /F1 9.50 Tf 42.00 129.89 Td (would make the training sample depend unnecessarily on small amounts of incidental incompleteness. More complex) Tj ET
+BT /F1 9.50 Tf 42.00 117.89 Td (model-based imputation was also rejected for the primary pipeline because the feature space is intentionally compact,) Tj ET
+BT /F1 9.50 Tf 42.00 105.89 Td (the missingness burden is low, and model-based imputation would add additional fitted components that could complicate) Tj ET
+BT /F1 9.50 Tf 42.00 93.89 Td (reproducibility without clear benefit. The chosen approach is therefore deliberately simple, robust, and proportionate) Tj ET
+BT /F1 9.50 Tf 42.00 81.89 Td (to the data problem actually observed.) Tj ET
+BT /F1 9.50 Tf 42.00 63.89 Td (Duplicate handling is likewise explicit. Assignment 5 detected no exact full-row duplicates and no duplicate) Tj ET
+BT /F1 9.50 Tf 42.00 51.89 Td (Date-PracticeCode-Sex keys in the raw table. Even so, the production preprocessing contract will enforce these checks) Tj ET
+BT /F1 9.00 Tf 279.64 24.00 Td (Page 2) Tj ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 3 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 6 0 R >>
+endobj
+8 0 obj
+<< /Length 8051 >>
+stream
+BT /F1 9.50 Tf 42.00 795.89 Td (each time new data are loaded. If exact duplicate raw rows appear, they may be removed deterministically before) Tj ET
+BT /F1 9.50 Tf 42.00 783.89 Td (aggregation. If duplicate analytical keys appear after merging supporting inputs, the pipeline should fail fast and) Tj ET
+BT /F1 9.50 Tf 42.00 771.89 Td (report the offending keys rather than silently averaging or overwriting them. Silent reconciliation would hide data) Tj ET
+BT /F1 9.50 Tf 42.00 759.89 Td (quality problems and would not be acceptable in a thesis workflow.) Tj ET
+BT /F1 9.50 Tf 42.00 741.89 Td (Inconsistent entries are treated as validation errors rather than as opportunities for ad hoc repair. Date is parsed to) Tj ET
+BT /F1 9.50 Tf 42.00 729.89 Td (a real date type, numeric age columns are coerced to numeric, and categorical labels such as Sex, HB, and HSCP are) Tj ET
+BT /F1 9.50 Tf 42.00 717.89 Td (normalized for whitespace and basic formatting before checks are run. Sex is validated against the expected set {All,) Tj ET
+BT /F1 9.50 Tf 42.00 705.89 Td (Female, Male}. Records that violate this minimal schema should be logged for audit and excluded from automated modeling) Tj ET
+BT /F1 9.50 Tf 42.00 693.89 Td (until the source issue is resolved. This policy supports generalization because it prevents the model from learning from) Tj ET
+BT /F1 9.50 Tf 42.00 681.89 Td (malformed records while keeping the rest of the dataset intact.) Tj ET
+BT /F2 13.00 Tf 42.00 659.89 Td (C. Scaling, Normalization, and Encoding) Tj ET
+BT /F1 9.50 Tf 42.00 633.89 Td (The scaling strategy is designed around the model families currently planned for baseline comparison, namely OLS for F0) Tj ET
+BT /F1 9.50 Tf 42.00 621.89 Td (and Ridge regression for F1. Linear regression does not strictly require scaling for prediction, but Ridge is penalty) Tj ET
+BT /F1 9.50 Tf 42.00 609.89 Td (based and therefore sensitive to the relative scale of predictors. To keep the experimental regime consistent across the) Tj ET
+BT /F1 9.50 Tf 42.00 597.89 Td (linear baselines, numeric variables are standardized with StandardScaler after imputation and after any deterministic) Tj ET
+BT /F1 9.50 Tf 42.00 585.89 Td (feature transformation such as log1p\(AllAges\). This yields comparable numeric conditioning across models and improves) Tj ET
+BT /F1 9.50 Tf 42.00 573.89 Td (interpretability of regularized coefficients.) Tj ET
+BT /F1 9.50 Tf 42.00 555.89 Td (The key normalization decision concerns practice size. Assignment 5 showed that AllAges is not approximately symmetric) Tj ET
+BT /F1 9.50 Tf 42.00 543.89 Td (and that the upper tail represents meaningful large practices rather than random corruption. For that reason, raw) Tj ET
+BT /F1 9.50 Tf 42.00 531.89 Td (AllAges should not be winsorized or indiscriminately removed. A log1p transformation is preferred because it compresses) Tj ET
+BT /F1 9.50 Tf 42.00 519.89 Td (the upper tail, reduces leverage, and preserves the ordinal information that larger practices remain larger.) Tj ET
+BT /F1 9.50 Tf 42.00 507.89 Td (RobustScaler was considered as an alternative, but it was not chosen as the primary strategy because the core issue is) Tj ET
+BT /F1 9.50 Tf 42.00 495.89 Td (skewness, not measurement error, and log transformation addresses the shape of the variable more directly while) Tj ET
+BT /F1 9.50 Tf 42.00 483.89 Td (remaining easy to explain in the thesis text.) Tj ET
+BT /F1 9.50 Tf 42.00 465.89 Td (Categorical encoding is handled with one-hot encoding using handle_unknown = ignore. This is appropriate for HB and HSCP) Tj ET
+BT /F1 9.50 Tf 42.00 453.89 Td (because they have moderate, not extreme, cardinality: 16 and 33 levels respectively in the EDA. One-hot encoding is) Tj ET
+BT /F1 9.50 Tf 42.00 441.89 Td (transparent, reproducible, and compatible with linear models. Target encoding was rejected because the target-bearing) Tj ET
+BT /F1 9.50 Tf 42.00 429.89 Td (sample currently available in the repository is tiny and because target encoding creates a direct leakage risk if not) Tj ET
+BT /F1 9.50 Tf 42.00 417.89 Td (nested carefully inside training folds. Since the thesis at this stage prioritizes methodological discipline over) Tj ET
+BT /F1 9.50 Tf 42.00 405.89 Td (aggressive compression, one-hot encoding is the safer and more defensible choice.) Tj ET
+BT /F1 9.50 Tf 42.00 387.89 Td (High-cardinality treatment requires a distinction between true features and identifiers. PracticeCode has more than one) Tj ET
+BT /F1 9.50 Tf 42.00 375.89 Td (thousand levels and repeats over time. It is therefore not encoded as a predictor at all. Using it as a model input) Tj ET
+BT /F1 9.50 Tf 42.00 363.89 Td (would let the estimator memorize practice-specific effects and would undermine the substantive goal of testing whether) Tj ET
+BT /F1 9.50 Tf 42.00 351.89 Td (demographic structure carries explanatory signal. PracticeCode is retained only for indexing, merges, and grouped) Tj ET
+BT /F1 9.50 Tf 42.00 339.89 Td (validation. In contrast, HB and HSCP are substantive contextual variables, so they remain in scope, but without) Tj ET
+BT /F1 9.50 Tf 42.00 327.89 Td (interactions and without target-based smoothing in the primary pipeline.) Tj ET
+BT /F1 9.50 Tf 42.00 309.89 Td (Transformation consistency between training and testing is ensured by implementation. Scaling and encoding are not run) Tj ET
+BT /F1 9.50 Tf 42.00 297.89 Td (as standalone preprocessing scripts on the full dataset. Instead, they are placed inside a scikit-learn Pipeline and) Tj ET
+BT /F1 9.50 Tf 42.00 285.89 Td (ColumnTransformer so that fit is executed only on the training portion of each split, while transform is applied) Tj ET
+BT /F1 9.50 Tf 42.00 273.89 Td (unchanged to held-out data. This design is one of the central leakage controls in Assignment 6. Without it, means,) Tj ET
+BT /F1 9.50 Tf 42.00 261.89 Td (variances, and category sets from the evaluation data would leak into the training process.) Tj ET
+BT /F2 13.00 Tf 42.00 239.89 Td (D. Feature Engineering and Transformation) Tj ET
+BT /F1 9.50 Tf 42.00 213.89 Td (Feature engineering is intentionally compact and hypothesis driven. Assignment 5 showed that the data contain useful) Tj ET
+BT /F1 9.50 Tf 42.00 201.89 Td (demographic structure, but it also showed that too many overlapping counts and shares would create multicollinearity.) Tj ET
+BT /F1 9.50 Tf 42.00 189.89 Td (The Assignment 6 response is therefore not to maximize the number of derived columns, but to construct a small set of) Tj ET
+BT /F1 9.50 Tf 42.00 177.89 Td (interpretable variables that correspond to the research question and that can be justified empirically.) Tj ET
+BT /F1 9.50 Tf 42.00 159.89 Td (The primary engineered size feature is log_AllAges = log1p\(AllAges\). Its motivation is directly empirical: practice size) Tj ET
+BT /F1 9.50 Tf 42.00 147.89 Td (is right skewed, and the largest practices are real but influential observations. The expected contribution of) Tj ET
+BT /F1 9.50 Tf 42.00 135.89 Td (log_AllAges is better-behaved linear modeling with reduced leverage from the upper tail. The main risk is) Tj ET
+BT /F1 9.50 Tf 42.00 123.89 Td (interpretational: the coefficient is no longer in raw patient units. That risk is acceptable because the transformation) Tj ET
+BT /F1 9.50 Tf 42.00 111.89 Td (is monotonic, explicitly documented, and easy to explain.) Tj ET
+BT /F1 9.50 Tf 42.00 93.89 Td (The primary engineered demographic feature is share_age_65_plus, defined as the sum of Ages65to74, Ages75to84, and) Tj ET
+BT /F1 9.50 Tf 42.00 81.89 Td (Ages85plus divided by AllAges. Its motivation is twofold. First, older population structure is substantively plausible) Tj ET
+BT /F1 9.50 Tf 42.00 69.89 Td (for hospital utilization. Second, Assignment 5 showed that many age-share variables are strongly dependent, so a compact) Tj ET
+BT /F1 9.50 Tf 42.00 57.89 Td (and domain-relevant summary is preferable to including many adjacent age bands simultaneously. The expected contribution) Tj ET
+BT /F1 9.00 Tf 279.64 24.00 Td (Page 3) Tj ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 3 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 8 0 R >>
+endobj
+10 0 obj
+<< /Length 7941 >>
+stream
+BT /F1 9.50 Tf 42.00 795.89 Td (is that the feature captures aging burden without requiring a high-dimensional age profile. The main risks are) Tj ET
+BT /F1 9.50 Tf 42.00 783.89 Td (compositional dependence and overlap with other age-derived variables. To limit those risks, raw age counts are not used) Tj ET
+BT /F1 9.50 Tf 42.00 771.89 Td (alongside the shares in the same linear specification, and only a small number of ratios are retained.) Tj ET
+BT /F1 9.50 Tf 42.00 753.89 Td (The second primary engineered demographic feature is share_female, defined as female_population divided by AllAges. This) Tj ET
+BT /F1 9.50 Tf 42.00 741.89 Td (feature is motivated by the possibility that sex composition may explain some utilization differences across practices.) Tj ET
+BT /F1 9.50 Tf 42.00 729.89 Td (It is easy to interpret and uses information already present in the raw table. Its main risk is structural missingness) Tj ET
+BT /F1 9.50 Tf 42.00 717.89 Td (when a female row is absent for a practice-date group. That risk is addressed upstream by removing the very small number) Tj ET
+BT /F1 9.50 Tf 42.00 705.89 Td (of incomplete sex bundles rather than by inventing a synthetic female count.) Tj ET
+BT /F1 9.50 Tf 42.00 687.89 Td (The preprocessing code also derives share_age_0_14, because it is a valid descriptive summary and may be useful for) Tj ET
+BT /F1 9.50 Tf 42.00 675.89 Td (later auditing or sensitivity analysis. However, it is not included in the primary F1 baseline model. The reason is) Tj ET
+BT /F1 9.50 Tf 42.00 663.89 Td (methodological restraint: Assignment 5 already documented strong compositional dependence among age shares, so the) Tj ET
+BT /F1 9.50 Tf 42.00 651.89 Td (baseline extended model should not combine multiple overlapping share summaries unless that decision is separately) Tj ET
+BT /F1 9.50 Tf 42.00 639.89 Td (justified. Keeping share_age_0_14 in the processed dataset while excluding it from the default feature set preserves) Tj ET
+BT /F1 9.50 Tf 42.00 627.89 Td (flexibility without violating comparability.) Tj ET
+BT /F1 9.50 Tf 42.00 609.89 Td (No dimensionality reduction method such as PCA is used in the primary pipeline. Although PCA could compress correlated) Tj ET
+BT /F1 9.50 Tf 42.00 597.89 Td (variables, it would reduce interpretability and would weaken the direct connection between the engineered features and) Tj ET
+BT /F1 9.50 Tf 42.00 585.89 Td (the thesis hypothesis. The same logic applies to interaction terms. Interactions between geography, deprivation, and) Tj ET
+BT /F1 9.50 Tf 42.00 573.89 Td (demographic shares may eventually be interesting, but they would materially change model complexity and would make the) Tj ET
+BT /F1 9.50 Tf 42.00 561.89 Td (baseline comparison harder to interpret. For Assignment 7 baseline modeling, the preprocessing regime should remain) Tj ET
+BT /F1 9.50 Tf 42.00 549.89 Td (intentionally simple.) Tj ET
+BT /F1 9.50 Tf 42.00 531.89 Td (No target transformation is applied at this stage. Assignment 5 made clear that the target-bearing sample currently) Tj ET
+BT /F1 9.50 Tf 42.00 519.89 Td (stored in the repository is only a small reproducibility sample and should not be used to justify aggressive) Tj ET
+BT /F1 9.50 Tf 42.00 507.89 Td (target-dependent engineering decisions. Therefore, the target remains in its original scale for baseline experiments,) Tj ET
+BT /F1 9.50 Tf 42.00 495.89 Td (and any later transformation of the response would need to be justified on the full thesis dataset.) Tj ET
+BT /F2 13.00 Tf 42.00 473.89 Td (E. Feature Selection Strategy) Tj ET
+BT /F1 9.50 Tf 42.00 447.89 Td (The primary Assignment 6 pipeline does not use automatic wrapper or embedded feature selection. This is a deliberate) Tj ET
+BT /F1 9.50 Tf 42.00 435.89 Td (design choice, not an omission. The feature space after engineering is already compact, and the EDA showed that the main) Tj ET
+BT /F1 9.50 Tf 42.00 423.89 Td (risk is not under-selection but uncontrolled overlap among algebraically related variables. Automatic stepwise selection) Tj ET
+BT /F1 9.50 Tf 42.00 411.89 Td (or repeated target-driven filtering at this stage would introduce instability, increase the chance of optimistic) Tj ET
+BT /F1 9.50 Tf 42.00 399.89 Td (estimates, and make the F0 versus F1 comparison harder to interpret.) Tj ET
+BT /F1 9.50 Tf 42.00 381.89 Td (Instead, feature selection is handled as a predeclared filter-style design rule based on theory, data structure, and) Tj ET
+BT /F1 9.50 Tf 42.00 369.89 Td (Assignment 5 evidence. The criteria are as follows: retain variables that are substantively linked to the research) Tj ET
+BT /F1 9.50 Tf 42.00 357.89 Td (question, exclude variables with overwhelming missingness or metadata status, avoid simultaneous inclusion of multiple) Tj ET
+BT /F1 9.50 Tf 42.00 345.89 Td (algebraically dependent age representations, and exclude identifiers that would create memorization rather than) Tj ET
+BT /F1 9.50 Tf 42.00 333.89 Td (explanation. Under these rules, the baseline F0 feature set contains log_AllAges and gp_availability. The extended F1) Tj ET
+BT /F1 9.50 Tf 42.00 321.89 Td (feature set contains log_AllAges, gp_availability, share_age_65_plus, share_female, deprivation_index, and the encoded) Tj ET
+BT /F1 9.50 Tf 42.00 309.89 Td (HB and HSCP controls.) Tj ET
+BT /F1 9.50 Tf 42.00 291.89 Td (This strategy is reproducible because the feature lists are declared in configuration rather than chosen interactively) Tj ET
+BT /F1 9.50 Tf 42.00 279.89 Td (after inspecting validation scores. It also avoids leakage because the inclusion or exclusion of variables is not) Tj ET
+BT /F1 9.50 Tf 42.00 267.89 Td (learned from the held-out target values. In practical terms, the selection decision is locked before model training and) Tj ET
+BT /F1 9.50 Tf 42.00 255.89 Td (is documented in the experiment configuration files.) Tj ET
+BT /F1 9.50 Tf 42.00 237.89 Td (Alternative selection methods were considered. Correlation-threshold filters based on the target were rejected because) Tj ET
+BT /F1 9.50 Tf 42.00 225.89 Td (the available sample for target inspection is too small and because such filters are unstable in the presence of) Tj ET
+BT /F1 9.50 Tf 42.00 213.89 Td (correlated predictors. Wrapper methods were rejected because they would substantially increase computational cost and) Tj ET
+BT /F1 9.50 Tf 42.00 201.89 Td (would entangle model selection with preprocessing at a stage where the thesis objective is controlled baseline) Tj ET
+BT /F1 9.50 Tf 42.00 189.89 Td (comparison. Embedded selection methods such as Lasso may be considered in later modeling assignments, but if used they) Tj ET
+BT /F1 9.50 Tf 42.00 177.89 Td (must be treated as separate model families and evaluated with the same fold-wise leakage controls.) Tj ET
+BT /F1 9.50 Tf 42.00 159.89 Td (The impact on interpretability is positive. A restrained and predeclared feature set makes the subsequent coefficients) Tj ET
+BT /F1 9.50 Tf 42.00 147.89 Td (and performance differences easier to explain. The impact on computational cost is also positive because the design) Tj ET
+BT /F1 9.50 Tf 42.00 135.89 Td (matrix remains modest, particularly compared with what would happen if all age bands, many share summaries, and) Tj ET
+BT /F1 9.50 Tf 42.00 123.89 Td (identifier-like variables were included simultaneously.) Tj ET
+BT /F2 13.00 Tf 42.00 101.89 Td (F. Pipeline Formalization and Reproducibility) Tj ET
+BT /F1 9.50 Tf 42.00 75.89 Td (The engineering implementation follows the project architecture from Assignment 4. Configuration is YAML driven. The) Tj ET
+BT /F1 9.50 Tf 42.00 63.89 Td (base configuration stores shared paths, seed, preprocessing defaults, and tracking rules. Experiment-specific files) Tj ET
+BT /F1 9.50 Tf 42.00 51.89 Td (override only what differs between runs, primarily the feature set and model type. This means that preprocessing is not) Tj ET
+BT /F1 9.00 Tf 279.64 24.00 Td (Page 4) Tj ET
+endstream
+endobj
+11 0 obj
+<< /Type /Page /Parent 3 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 10 0 R >>
+endobj
+12 0 obj
+<< /Length 6964 >>
+stream
+BT /F1 9.50 Tf 42.00 795.89 Td (an informal notebook action. It is a declared pipeline stage with deterministic inputs and outputs. The current) Tj ET
+BT /F1 9.50 Tf 42.00 783.89 Td (Assignment 4 repository already implements schema validation, analytical-dataset construction, manifest generation,) Tj ET
+BT /F1 9.50 Tf 42.00 771.89 Td (pipeline-contained imputation and encoding, and deterministic artifact tracking. Assignment 6 refines that foundation by) Tj ET
+BT /F1 9.50 Tf 42.00 759.89 Td (freezing the thesis-ready transformation contract: log_AllAges replaces raw AllAges in the model matrix, incomplete sex) Tj ET
+BT /F1 9.50 Tf 42.00 747.89 Td (bundles are excluded rather than approximated, and shuffled row-wise validation is replaced by grouped practice-aware) Tj ET
+BT /F1 9.50 Tf 42.00 735.89 Td (splitting to reduce leakage.) Tj ET
+BT /F1 9.50 Tf 42.00 717.89 Td (The formal preprocessing contract can be described in the following sequence:) Tj ET
+BT /F1 9.50 Tf 42.00 699.89 Td (1. Load the raw demographics table and supporting inputs from configured paths.) Tj ET
+BT /F1 9.50 Tf 42.00 681.89 Td (2. Validate required columns and parse Date.) Tj ET
+BT /F1 9.50 Tf 42.00 663.89 Td (3. Restrict the demographics table to Sex = All for aggregate population counts.) Tj ET
+BT /F1 9.50 Tf 42.00 645.89 Td (4. Merge female totals by Date and PracticeCode.) Tj ET
+BT /F1 9.50 Tf 42.00 627.89 Td (5. Remove analytically invalid records such as AllAges less than or equal to zero and incomplete sex bundles.) Tj ET
+BT /F1 9.50 Tf 42.00 609.89 Td (6. Derive log_AllAges, share_age_0_14, share_age_65_plus, and share_female.) Tj ET
+BT /F1 9.50 Tf 42.00 591.89 Td (7. Join gp_availability, deprivation_index, and hospital_use_per_1000.) Tj ET
+BT /F1 9.50 Tf 42.00 573.89 Td (8. Save the processed analytical dataset together with a manifest that records file hashes, column names, row count, and) Tj ET
+BT /F1 9.50 Tf 42.00 561.89 Td (   creation metadata.) Tj ET
+BT /F1 9.50 Tf 42.00 543.89 Td (9. For each experiment, define the feature subset from configuration.) Tj ET
+BT /F1 9.50 Tf 42.00 525.89 Td (10. Split the data with PracticeCode-aware validation so that the same practice does not contribute to both training and) Tj ET
+BT /F1 9.50 Tf 42.00 513.89 Td (    held-out evaluation.) Tj ET
+BT /F1 9.50 Tf 42.00 495.89 Td (11. Inside each training fold, fit median and most-frequent imputers, StandardScaler for numeric variables, and) Tj ET
+BT /F1 9.50 Tf 42.00 483.89 Td (    OneHotEncoder for categorical variables.) Tj ET
+BT /F1 9.50 Tf 42.00 465.89 Td (12. Fit the configured estimator on the transformed training matrix and apply the fitted pipeline unchanged to) Tj ET
+BT /F1 9.50 Tf 42.00 453.89 Td (    validation or test data.) Tj ET
+BT /F1 9.50 Tf 42.00 435.89 Td (13. Save metrics, configuration snapshot, metadata, git commit hash, and the serialized fitted pipeline artifact.) Tj ET
+BT /F1 9.50 Tf 42.00 417.89 Td (In scikit-learn terms, the stateful part of the implementation is an integrated Pipeline built around a) Tj ET
+BT /F1 9.50 Tf 42.00 405.89 Td (ColumnTransformer. Numeric columns pass through a sub-pipeline consisting of SimpleImputer\(strategy = median\), then) Tj ET
+BT /F1 9.50 Tf 42.00 393.89 Td (StandardScaler. Categorical columns pass through SimpleImputer\(strategy = most_frequent\), then) Tj ET
+BT /F1 9.50 Tf 42.00 381.89 Td (OneHotEncoder\(handle_unknown = ignore\). The final estimator is OLS for F0 and Ridge for F1 in the current baseline plan.) Tj ET
+BT /F1 9.50 Tf 42.00 369.89 Td (This object is fit only on training data and then serialized so that inference uses exactly the same transformations.) Tj ET
+BT /F1 9.50 Tf 42.00 351.89 Td (The separation between training and inference transformations is critical. Analytical-dataset construction is) Tj ET
+BT /F1 9.50 Tf 42.00 339.89 Td (deterministic and can be rerun from raw inputs. In contrast, imputation parameters, scaling parameters, and the realized) Tj ET
+BT /F1 9.50 Tf 42.00 327.89 Td (one-hot category map are learned artifacts. They belong to the trained pipeline, not to the raw dataset. By persisting) Tj ET
+BT /F1 9.50 Tf 42.00 315.89 Td (the fitted pipeline as a model artifact, the project guarantees that the exact same transformation logic can be replayed) Tj ET
+BT /F1 9.50 Tf 42.00 303.89 Td (for later evaluation or inference without manual reconstruction.) Tj ET
+BT /F1 9.50 Tf 42.00 285.89 Td (Reproducibility is further supported by the Assignment 4 tracking design. The processed dataset has a manifest with) Tj ET
+BT /F1 9.50 Tf 42.00 273.89 Td (input hashes. Each training run stores metrics, metadata, a configuration snapshot, and the model artifact in) Tj ET
+BT /F1 9.50 Tf 42.00 261.89 Td (deterministic locations derived from experiment name, configuration hash, and seed. The global seed is fixed in) Tj ET
+BT /F1 9.50 Tf 42.00 249.89 Td (configuration. Paths are resolved relative to the project root. These design choices matter because they eliminate) Tj ET
+BT /F1 9.50 Tf 42.00 237.89 Td (hidden local decisions and make it possible to connect every result to a specific dataset, configuration, and code) Tj ET
+BT /F1 9.50 Tf 42.00 225.89 Td (state.) Tj ET
+BT /F2 13.00 Tf 42.00 203.89 Td (G. Impact on Experimental Design) Tj ET
+BT /F1 9.50 Tf 42.00 177.89 Td (The preprocessing decisions above directly influence how later baseline experiments can be interpreted. First, keeping) Tj ET
+BT /F1 9.50 Tf 42.00 165.89 Td (the data-construction layer constant across models ensures baseline comparability. F0 and F1 will be trained on the same) Tj ET
+BT /F1 9.50 Tf 42.00 153.89 Td (cleaned analytical dataset, use the same target definition, follow the same group-aware split logic, and apply the same) Tj ET
+BT /F1 9.50 Tf 42.00 141.89 Td (fold-wise imputation and encoding rules. The only substantive difference will be the additional explanatory features in) Tj ET
+BT /F1 9.50 Tf 42.00 129.89 Td (F1 and, where relevant, the estimator choice. This is essential if the thesis is to claim that any improvement is due to) Tj ET
+BT /F1 9.50 Tf 42.00 117.89 Td (demographic information rather than to a more favorable preprocessing path.) Tj ET
+BT /F1 9.50 Tf 42.00 99.89 Td (Second, the chosen pipeline reduces evaluation bias. Excluding QF metadata prevents artificial signal from sparse) Tj ET
+BT /F1 9.50 Tf 42.00 87.89 Td (administrative flags. Log transforming AllAges reduces leverage without deleting meaningful observations. Restrained) Tj ET
+BT /F1 9.50 Tf 42.00 75.89 Td (feature engineering avoids inflated multicollinearity. Pipeline-integrated preprocessing prevents leakage from global) Tj ET
+BT /F1 9.50 Tf 42.00 63.89 Td (scaling or global imputation. Group-aware splitting reduces the risk that the model appears stronger simply because the) Tj ET
+BT /F1 9.50 Tf 42.00 51.89 Td (same practice contributes similar rows to both training and testing.) Tj ET
+BT /F1 9.00 Tf 279.64 24.00 Td (Page 5) Tj ET
+endstream
+endobj
+13 0 obj
+<< /Type /Page /Parent 3 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 12 0 R >>
+endobj
+14 0 obj
+<< /Length 2916 >>
+stream
+BT /F1 9.50 Tf 42.00 795.89 Td (Third, the pipeline leaves room for controlled sensitivity analysis without undermining the primary comparison. It would) Tj ET
+BT /F1 9.50 Tf 42.00 783.89 Td (be reasonable in later work to compare grouped validation against a time-aware split, or to compare HB plus HSCP against) Tj ET
+BT /F1 9.50 Tf 42.00 771.89 Td (a simpler geography specification, but such comparisons must be defined as explicit secondary experiments. The baseline) Tj ET
+BT /F1 9.50 Tf 42.00 759.89 Td (F0 versus F1 comparison for Assignment 7 should use one fixed preprocessing regime. This is important because changing) Tj ET
+BT /F1 9.50 Tf 42.00 747.89 Td (transformations at the same time as changing the model would destroy interpretability.) Tj ET
+BT /F1 9.50 Tf 42.00 729.89 Td (Finally, the preprocessing choices are closely aligned with the research question. The thesis is not asking whether any) Tj ET
+BT /F1 9.50 Tf 42.00 717.89 Td (flexible transformation can improve predictive scores. It is asking whether demographic structure adds explanatory value) Tj ET
+BT /F1 9.50 Tf 42.00 705.89 Td (beyond a simpler operational baseline. The Assignment 6 pipeline therefore emphasizes interpretable demographic) Tj ET
+BT /F1 9.50 Tf 42.00 693.89 Td (summaries, conservative cleaning, and strict leakage control. If the extended feature set outperforms the baseline under) Tj ET
+BT /F1 9.50 Tf 42.00 681.89 Td (these conditions, the result will be methodologically credible. If it does not, that conclusion will also be credible) Tj ET
+BT /F1 9.50 Tf 42.00 669.89 Td (because the evaluation will not have been distorted by hidden preprocessing advantages.) Tj ET
+BT /F2 13.00 Tf 42.00 647.89 Td (Conclusion) Tj ET
+BT /F1 9.50 Tf 42.00 621.89 Td (Assignment 5 established what the data look like; Assignment 6 fixes how the data will be transformed. The resulting) Tj ET
+BT /F1 9.50 Tf 42.00 609.89 Td (preprocessing regime is explicit, empirically justified, and compatible with the reproducibility framework already) Tj ET
+BT /F1 9.50 Tf 42.00 597.89 Td (present in the repository. It excludes overwhelmingly missing metadata, removes only structurally invalid records,) Tj ET
+BT /F1 9.50 Tf 42.00 585.89 Td (transforms practice size instead of deleting large practices, uses compact and interpretable engineered demographic) Tj ET
+BT /F1 9.50 Tf 42.00 573.89 Td (features, and ensures that all learned transformations are estimated only on training data.) Tj ET
+BT /F1 9.50 Tf 42.00 555.89 Td (This preprocessing contract is therefore suitable for the next stage of the seminar sequence. It preserves fairness) Tj ET
+BT /F1 9.50 Tf 42.00 543.89 Td (between F0 and F1, limits leakage risk, documents every major decision, and provides a reproducible bridge from) Tj ET
+BT /F1 9.50 Tf 42.00 531.89 Td (exploratory understanding to baseline modeling.) Tj ET
+BT /F1 9.00 Tf 279.64 24.00 Td (Page 6) Tj ET
+endstream
+endobj
+15 0 obj
+<< /Type /Page /Parent 3 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 14 0 R >>
+endobj
+16 0 obj
+<< /Type /Catalog /Pages 3 0 R >>
+endobj
+17 0 obj
+<< /Title (Assignment 6 - Feature Engineering and Preprocessing) /Author (s30687) /Producer (Custom Python PDF generator) >>
+endobj
+xref
+0 18
+0000000000 65535 f 
+0000000015 00000 n 
+0000000085 00000 n 
+0000000160 00000 n 
+0000000250 00000 n 
+0000007892 00000 n 
+0000008034 00000 n 
+0000015484 00000 n 
+0000015626 00000 n 
+0000023729 00000 n 
+0000023871 00000 n 
+0000031865 00000 n 
+0000032009 00000 n 
+0000039026 00000 n 
+0000039170 00000 n 
+0000042139 00000 n 
+0000042283 00000 n 
+0000042333 00000 n 
+trailer
+<< /Size 18 /Root 16 0 R /Info 17 0 R >>
+startxref
+42474
+%%EOF

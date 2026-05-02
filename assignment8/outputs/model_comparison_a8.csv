@@ -1,0 +1,7 @@
+model,features,test_r2,test_rmse,test_mae,cv_rmse,source,delta_r2_vs_ols,delta_rmse_pct_vs_ols
+Dummy mean (A7),F0,-818.568,52.632,52.6,45.871,A7,-801.951,-582.03
+OLS F0 (A7),F0,-16.617,7.717,7.539,43.961,A7,0.0,0.0
+Ridge F1 alpha=0.1 (A7),F1,-18.357,8.089,8.083,8.314,A7,-1.74,-4.82
+Decision Tree F1 (A7),F1,-438.536,38.544,38.5,57.627,A7,-421.919,-399.47
+Ridge F1 alpha=0.01 (A8 primary),F1,0.46853,1.340287,1.335339,4.8357,A8,17.086,82.63
+"Random Forest F1 {'n_estimators': 200, 'max_depth': 3, 'min_samples_leaf': 2} (A8 benchmark)",F1,-297.003634,31.737238,31.683702,34.1703,A8,-280.387,-311.26
